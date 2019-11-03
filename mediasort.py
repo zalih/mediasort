@@ -4,6 +4,7 @@
 
 # Move image files based on exif datetime to subfolders. Group them by year, month or day.
 # If exif datetime is not available, look for datetime in filename.
+# Video files are moved into a separate subfolder
 
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -20,21 +21,29 @@ logging.basicConfig(filename='./mediasort.log',
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
                     level=logging.INFO)
+# global variables
 
+# available formats used for output folder creation
 output_formats = {
     'YEARLY': "%Y",
     'MONTHLY': "%Y-%m",
     'DAILY': "%Y-%m-%d-%A"
 }
+# variable to store output folder format
+output_format = ""
+
 EXIF_DATETIME = "%Y:%m:%d %H:%M:%S"
 FILENAME_DATETIME = "%Y%m%d_%H%M%S"
 DEFAULT_SOURCE_FOLDER = "."
 DEFAULT_TARGET_FOLDER = "."
+
+# subfolder for video files
 DEFAULT_VIDEO_FOLDER = "video"
 
-output_format = ""
 filename_pattern = FILENAME_DATETIME
 video_subfolder = DEFAULT_VIDEO_FOLDER
+
+# variables to store command line options
 opt_recursion = None
 recursion_level = 0  # type: int
 opt_simulate = True
@@ -151,6 +160,7 @@ def scan_files(source, output, max_recursion_level):
     filename_regex_video = r"(?P<filename>.*)\.(?P<extension>MPG|mpg|MOV|mov|AVI|avi|MPEG|mpeg|MP4|mp4)"
     filename_regex_other = r"(?P<filename>.*)\.(?P<extension>tiff|tif|TIF|PNG|png)"
 
+    # increase global recursion counter when function entered and decrease before exit
     recursion_level += 1
     logging.debug("Recursion Level: " + str(recursion_level) + "/" + str(opt_recursion))
 
@@ -161,6 +171,8 @@ def scan_files(source, output, max_recursion_level):
                 filename + " is a folder. " + "Max level " + str(max_recursion_level) + " Current level " + str(
                     recursion_level))
             if max_recursion_level == 0 or max_recursion_level >= recursion_level:
+                # opt_single is true, when an output folder has been specified
+                # if no output folder specified, create output folder in the same location as the source file
                 if not opt_single:
                     output = os.path.join(source, filename)
                 scan_files(os.path.join(source, filename), output, recursion_level)
@@ -179,7 +191,6 @@ def scan_files(source, output, max_recursion_level):
     return
 
 def main(argv):
-    # cli parameter defaults
     global opt_recursion
     global opt_simulate
     global opt_single
@@ -226,10 +237,13 @@ def main(argv):
         logging.debug("Target:" + output_folder)
     else:
         output_folder = DEFAULT_TARGET_FOLDER
+        # no single location for output if no target folder specified
+        # set opt_single to false, source file location will be used for outputs
         opt_single = False
     if opt_recursion:
         logging.debug("Recursion:" + str(opt_recursion))
 
+    # start reading the source folder
     scan_files(source_folder, output_folder, opt_recursion)
 
 
