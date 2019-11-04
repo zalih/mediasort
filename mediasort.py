@@ -17,17 +17,13 @@ import re
 import sys
 import logging
 
-logging.basicConfig(filename='./mediasort.log',
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.INFO)
 # global variables
 
 # available formats used for output folder creation
 output_formats = {
     'YEARLY': "%Y",
     'MONTHLY': "%Y-%m",
-    'DAILY': "%Y-%m-%d-%A"
+    'DAILY': "%Y-%m-%d-%a"
 }
 # variable to store output folder format
 output_format = ""
@@ -59,9 +55,13 @@ def get_field(exif, field):
 
 def make_foldername(date_str, pattern):
     global output_format
+    return make_foldername(date_str, pattern, output_format)
+
+
+def make_foldername(date_str, pattern, output_pattern):
     if date_str:
         image_datetime = datetime.strptime(date_str, pattern)
-        date_str = image_datetime.strftime(output_format)
+        date_str = image_datetime.strftime(output_pattern)
         logging.debug("Make Foldername: " + date_str)
     return date_str
 
@@ -71,7 +71,7 @@ def get_date_from_filename(name):
     filename_matches = re.search(r"(\d{8}_\d{6})", name)
     if filename_matches:
         date_str = filename_matches.group()
-    return make_foldername(date_str, FILENAME_DATETIME)
+    return date_str
 
 
 def get_date_from_exif(exif_data):
@@ -79,22 +79,21 @@ def get_date_from_exif(exif_data):
     return make_foldername(date_str, EXIF_DATETIME)
 
 
-def create_target_folder(output_folder, folder_str, video=""):
-    if not os.path.exists(os.path.join(output_folder, folder_str)):
+def create_target_folder(path):
+    if not os.path.exists(path):
         if not opt_simulate:
-            # os.makedirs(os.path.join(output_folder, folder_str))
-            logging.debug("Image Folder created: " + os.path.join(output_folder, folder_str))
-    if not os.path.exists(os.path.join(output_folder, folder_str, video)):
-        if not opt_simulate:
-            # os.makedirs(os.path.join(output_folder, folder_str, video))
-            logging.debug("Video Folder created: " + os.path.join(output_folder, folder_str, video))
-    return os.path.join(output_folder, folder_str)
+            None
+            # TODO: activate after successful simulation
+            # os.makedirs(os.path.join(path))
+        logging.debug("Folder created: " + path)
+    return
 
 
 def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
-    create_target_folder(target_folder, subfolder_name, video)
+    create_target_folder(os.path.join(target_folder, subfolder_name, video))
 
     if not opt_simulate:
+        # TODO: activate after successful simulation
         # shutil.move(os.path.join(source_folder, filename),
         #            os.path.join(target_folder, video, filename))
         logging.info(
@@ -119,7 +118,7 @@ def move_video_file(filename, source, target):
 
 def move_other_file(filename, source, output):
     logging.debug("Other file: " + filename)
-    subfolder_name = get_date_from_filename(filename)
+    subfolder_name = make_foldername(get_date_from_filename(filename), FILENAME_DATETIME)
     if subfolder_name:
         move_file(filename, source, output, subfolder_name)
     else:
@@ -248,5 +247,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='./mediasort.log',
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
+
+
     logging.info("mediasort.py started")
     main(sys.argv[1:])
