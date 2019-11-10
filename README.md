@@ -8,12 +8,13 @@ This was made for usage on my Synology Diskstation.
 * Install the DSM package Python Modules to run it
 
 ## Usage
+```
 Usage: mediasort.py [options]
 
 Options:
   -h, --help            show this help message and exit
-  -i SOURCE, --input=SOURCE, --source=SOURCE
-                        Read from folder SOURCE. Default = current dir
+  -i SOURCE, --input=SOURCE, --source=SOURCE 
+                       Read from folder SOURCE. Default = current dir
   -o TARGET, --output=TARGET, --target=TARGET
                         Write all files to a single location = TARGET. If not
                         specified = current working dir
