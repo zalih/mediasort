@@ -60,8 +60,11 @@ def get_field(exif, field):
 # output_pattern = target date format for output
 def make_foldername_from_date(date_str, pattern, output_pattern):
     if date_str:
-        image_datetime = datetime.strptime(date_str, pattern)
-        date_str = image_datetime.strftime(output_pattern)
+        try:
+            image_datetime = datetime.strptime(date_str, pattern)
+            date_str = image_datetime.strftime(output_pattern)
+        except ValueError as ve:
+            logging.error(str(ve) + " Parameter: (" + date_str + "," + pattern + "," + output_pattern)
         logging.debug("Make Foldername: " + date_str)
     return date_str
 
@@ -82,7 +85,10 @@ def get_date_from_exif(exif_data):
 def create_target_folder(path):
     if not os.path.exists(path):
         if not opt_simulate:
-            os.makedirs(os.path.join(path))
+            try:
+                os.makedirs(os.path.join(path))
+            except IOError as ioe:
+                logging.error(str(ioe) + "Folder: " + os.path.join(path))
         logging.debug("Folder created: " + path)
     return
 
@@ -98,7 +104,8 @@ def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
             logging.info(
                 os.path.join(source_folder, filename) + ": moving to " +
                 os.path.join(target_folder, subfolder_name, video))
-        except IOError:
+        except IOError as ioe:
+            logging.error(str(ioe))
             moved = False
         else:
             moved = True
@@ -229,7 +236,7 @@ def main(argv):
                       help="Read from folder SOURCE. Default = current dir")
 
     parser.add_option("-o", "--output", "--target", type="string", dest="target",
-                      help="Write all files to a single location = TARGET. If not specified = source dir of file")
+                      help="Write all files to a single location = TARGET. If not specified = current working dir")
 
     parser.add_option("-r", "--recursive", "--recursionlevel", type="int", dest="level",
                       help="Levels of subfolders to scan. 0 = unlimited")
