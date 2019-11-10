@@ -121,10 +121,10 @@ def move_video_file(filename, source, target, output_format, datetime_format):
     return
 
 
-def move_other_file(filename, source, output, datetime_format):
+def move_other_file(filename, source, output, output_format, datetime_format):
     logging.debug("Other file: " + filename)
     subfolder_name = make_foldername_from_date(get_date_from_filename(filename, datetime_format),
-                                               datetime_format['regex'], output_format)
+                                               datetime_format['datetime'], output_format)
     if subfolder_name:
         move_file(filename, source, output, subfolder_name)
     else:
@@ -135,11 +135,19 @@ def move_other_file(filename, source, output, datetime_format):
 def move_exif_file(exif_file, filename, source, output, output_format):
     moved = False
     logging.debug("EXIF file: " + filename)
-    exif_data = exif_file._getexif()
-    if exif_data:
-        subfolder_name = make_foldername_from_date(get_date_from_exif(exif_data), DATETIME_FORMAT_EXIF, output_format)
-        if subfolder_name:
-            move = move_file(filename, source, output, subfolder_name)
+    try:
+        exif_data = exif_file._getexif()
+        if exif_data:
+            subfolder_name = make_foldername_from_date(get_date_from_exif(exif_data), DATETIME_FORMAT_EXIF,
+                                                       output_format)
+
+            if subfolder_name:
+                moved = move_file(filename, source, output, subfolder_name)
+
+    except AttributeError as error:
+        # Output expected AttributeErrors.
+        logging.error(str(error) + filename)
+
     return moved
 
 
@@ -174,19 +182,27 @@ def scan_files(source, output, max_recursion_level, output_format):
                     output = os.path.join(source, filename)
                 scan_files(os.path.join(source, filename), output, max_recursion_level, output_format)
 
+        match = False
+
         if check_match(r"(?P<filename>.*)\.(?P<extension>%s)" % FILE_EXTENSION_EXIF, filename):
             with open(os.path.join(source, filename), 'rb') as exif_file:
                 image_file = Image.open(exif_file)
-                move_exif_file(image_file, filename, source, output, output_format)
+                if move_exif_file(image_file, filename, source, output, output_format):
+                    continue
 
-        match = False
         for datetime_format in datetime_formats:
-            if check_match(r"(?P<filename>%s)\.(?P<extension>%s)" % (datetime_formats[datetime_format]['regex'], FILE_EXTENSION_VIDEO), filename):
+            if check_match(r"(?P<filename>%s.*)\.(?P<extension>%s)" % (datetime_formats[datetime_format]['regex'],
+                                                                       FILE_EXTENSION_VIDEO), filename):
                 move_video_file(filename, source, output, output_format, datetime_formats[datetime_format])
                 match = True
                 break
-            elif check_match(r"(?P<filename>%s)\.(?P<extension>%s)" % (datetime_formats[datetime_format]['regex'], FILE_EXTENSION_OTHER),
-                             filename):
+            elif check_match(r"(?P<filename>%s.*)\.(?P<extension>%s)" % (datetime_formats[datetime_format]['regex'],
+                                                                         FILE_EXTENSION_EXIF), filename):
+                move_other_file(filename, source, output, output_format, datetime_formats[datetime_format])
+                match = True
+                break
+            elif check_match(r"(?P<filename>%s.*)\.(?P<extension>%s)" % (datetime_formats[datetime_format]['regex'],
+                                                                         FILE_EXTENSION_OTHER), filename):
                 move_other_file(filename, source, output, output_format, datetime_formats[datetime_format])
                 match = True
                 break

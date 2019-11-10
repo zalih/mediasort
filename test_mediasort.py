@@ -52,6 +52,7 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join("target", "2019")))
         self.assertTrue(os.path.exists(os.path.join("target", "1975")))
         self.assertTrue(os.path.isfile(os.path.join("target", "2019", "IMG_4810.jpeg")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "2019", "IMG_20190610_190809.JPG")))
         testdata.cleanup_test_data()
 
     def test_daily_output(self):
@@ -60,6 +61,7 @@ class MediasortOutput(unittest.TestCase):
         mediasort.scan_files("source", "target", 0, output_formats['DAILY'])
         self.assertTrue(os.path.exists(os.path.join("target", "1975-05-17-Sat")))
         self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517_091500.mp4")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517_091500_1.mp4")))
         self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517-091500.mp4")))
         testdata.cleanup_test_data()
 
