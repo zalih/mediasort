@@ -19,7 +19,7 @@ Options:
                         Write all files to a single location = TARGET. If not
                         specified = current working dir
   -r LEVEL, --recursive=LEVEL, --recursionlevel=LEVEL
-                        Levels of subfolders to scan. 0 = unlimited
+                        Levels of subfolders to scan.
   -g GROUP, --groupby=GROUP
                         GROUP = YEARLY|MONTHLY|DAILY. Default = MONTHLY
   -s, --simulate        Simulation mode. No files will be moved
