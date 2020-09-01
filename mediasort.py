@@ -43,6 +43,7 @@ DEFAULT_TARGET_FOLDER = "."
 
 # subfolder for video files
 DEFAULT_VIDEO_FOLDER = "video"
+DEFAULT_OTHER_FOLDER = "other"
 
 # variables to store command line options
 opt_recursion = None
@@ -83,6 +84,9 @@ def get_date_from_exif(exif_data):
     date_str = get_field(exif_data, 'DateTime')
     return date_str
 
+def get_model_from_exif(exif_data):
+    model_str = get_field(exif_data, 'Model')
+    return model_str
 
 def create_target_folder(path):
     if not os.path.exists(path):
@@ -135,7 +139,7 @@ def move_other_file(filename, source, output, output_format, datetime_format):
     subfolder_name = make_foldername_from_date(get_date_from_filename(filename, datetime_format),
                                                datetime_format['datetime'], output_format)
     if subfolder_name:
-        move_file(filename, source, output, subfolder_name)
+        move_file(filename, source, output, subfolder_name, DEFAULT_OTHER_FOLDER)
     else:
         logging.warning(os.path.join(source, filename) + ": Can't get date from filename ")
     return
@@ -143,15 +147,18 @@ def move_other_file(filename, source, output, output_format, datetime_format):
 
 def move_exif_file(exif_file, filename, source, output, output_format):
     moved = False
+    other = ""
     logging.debug("EXIF file: " + filename)
     try:
         exif_data = exif_file._getexif()
         if exif_data:
             subfolder_name = make_foldername_from_date(get_date_from_exif(exif_data), DATETIME_FORMAT_EXIF,
                                                        output_format)
+            if get_model_from_exif(exif_data) == "":
+                other = DEFAULT_OTHER_FOLDER
 
             if subfolder_name:
-                moved = move_file(filename, source, output, subfolder_name)
+                moved = move_file(filename, source, output, subfolder_name, other)
 
     except AttributeError as error:
         # Output expected AttributeErrors.

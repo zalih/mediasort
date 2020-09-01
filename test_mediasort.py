@@ -5,8 +5,9 @@ import mediasort
 import os
 import logging
 import inspect
+from PIL import Image
 
-from mediasort import get_date_from_filename, make_foldername_from_date
+from mediasort import get_date_from_filename, make_foldername_from_date, get_model_from_exif
 from mediasort import output_formats, datetime_formats
 
 # atexit.register(testdata.cleanup_test_data)
@@ -33,6 +34,15 @@ class MediasortOutput(unittest.TestCase):
                          "1975-05-17-Sat")
 
     # system tests
+    def test_get_model_from_exif(self):
+        testdata.create_test_data()
+        self.log_testcase_name(inspect.currentframe().f_code.co_name)
+        with open(os.path.join("source", "IMG_4810.jpeg"), 'rb') as exif_file:
+            image_file = Image.open(exif_file)
+            exif_data = image_file._getexif()
+            self.assertEqual(get_model_from_exif(exif_data), "iPhone X")
+        testdata.cleanup_test_data()
+
     def test_monthly_output(self):
         self.log_testcase_name(inspect.currentframe().f_code.co_name)
         testdata.create_test_data()
@@ -44,6 +54,22 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join("target", "2019-08", "IMG_4810.jpeg")))
         testdata.cleanup_test_data()
 
+    def test_other_output(self):
+        self.log_testcase_name(inspect.currentframe().f_code.co_name)
+        testdata.create_test_data()
+        mediasort.scan_files("source", "target", 0, output_formats['MONTHLY'])
+        self.assertTrue(os.path.exists(os.path.join("target", "2019-06", "other")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "2019-06", "other", "IMG_20190610_190809.JPG")))
+        testdata.cleanup_test_data()
+
+    def test_no_model_in_exif(self):
+        self.log_testcase_name(inspect.currentframe().f_code.co_name)
+        testdata.create_test_data()
+        mediasort.scan_files("source", "target", 0, output_formats['MONTHLY'])
+        self.assertTrue(os.path.exists(os.path.join("target", "2020-05", "other")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "2020-05", "other", "IMG_20200506_125846.jpg")))
+        testdata.cleanup_test_data()
+
     def test_yearly_output(self):
         self.log_testcase_name(inspect.currentframe().f_code.co_name)
         testdata.create_test_data()
@@ -51,7 +77,7 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join("target", "2019")))
         self.assertTrue(os.path.exists(os.path.join("target", "1975")))
         self.assertTrue(os.path.isfile(os.path.join("target", "2019", "IMG_4810.jpeg")))
-        self.assertTrue(os.path.isfile(os.path.join("target", "2019", "IMG_20190610_190809.JPG")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "2019", "other", "IMG_20190610_190809.JPG")))
         testdata.cleanup_test_data()
 
     def test_daily_output(self):
