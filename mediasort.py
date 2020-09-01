@@ -222,7 +222,7 @@ def scan_files(source, output, max_recursion_level, output_format):
         if not match:
             logging.warning(os.path.join(source, filename) + ": Can't get date from exif or filename ")
 
-        recursion_level -= 1
+    recursion_level -= 1
     return
 
 

@@ -9,7 +9,6 @@ import inspect
 from mediasort import get_date_from_filename, make_foldername_from_date
 from mediasort import output_formats, datetime_formats
 
-
 # atexit.register(testdata.cleanup_test_data)
 
 
@@ -71,6 +70,9 @@ class MediasortOutput(unittest.TestCase):
         mediasort.scan_files("source", "target", 1, output_formats['YEARLY'])
         self.assertTrue(os.path.exists(os.path.join("target", "1975")))
         self.assertTrue(os.path.isfile(os.path.join("target", "1975", "video", "file11-19750517_091500.mp4")))
+        self.assertFalse(os.path.isfile(os.path.join("target", "1975", "video", "file21-19750517_091500.mp4")))
+        self.assertFalse(os.path.isfile(os.path.join("target", "1975", "video", "file31-19750517_091500.mp4")))
+
         testdata.cleanup_test_data()
 
     def test_recursion_lvl2(self):
