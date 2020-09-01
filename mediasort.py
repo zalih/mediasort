@@ -32,6 +32,8 @@ datetime_formats = {
     'OTHER': {'regex': r'\d{8}\-\d{6}', 'datetime': '%Y%m%d-%H%M%S'}
 }
 
+skip_folders = ["@eaDir", "thumbs.db"]
+
 FILE_EXTENSION_EXIF = 'JPG|jpg|jpeg|BMP|bmp|PNG|png'
 FILE_EXTENSION_VIDEO = 'MPG|mpg|MOV|mov|AVI|avi|MPEG|mpeg|MP4|mp4'
 FILE_EXTENSION_OTHER = 'tiff|tif|TIF'
@@ -178,7 +180,7 @@ def scan_files(source, output, max_recursion_level, output_format):
 
     for filename in os.listdir(source):
         logging.debug("Checking: " + filename)
-        if os.path.isdir(os.path.join(source, filename)) and max_recursion_level:
+        if os.path.isdir(os.path.join(source, filename)) and max_recursion_level and (filename not in skip_folders):
             logging.debug(
                 filename + " is a folder. " + "Max level " + str(max_recursion_level) + " Current level " + str(
                     recursion_level))

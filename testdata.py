@@ -19,6 +19,7 @@ def create_test_data():
     os.makedirs(os.path.join("source", "lvl11", "lvl21", "lvl31"))
     os.makedirs(os.path.join("source", "lvl12", "lvl22", "lvl32"))
     os.makedirs(os.path.join("source", "lvl13", "lvl23", "lvl33"))
+    os.makedirs(os.path.join("source", "@eaDir", "IMG_20190610_190809.JPG"))
     os.makedirs(os.path.join("target"))
 
     os.close(os.open(os.path.join("source", "file-19750517_091500.mp4"), os.O_CREAT))
