@@ -120,6 +120,18 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join("target", "1975", "video", "file31-19750517_091500.mp4")))
         testdata.cleanup_test_data()
 
+    def test_detect_already_sorted(self):
+        self.log_testcase_name(inspect.currentframe().f_code.co_name)
+        testdata.create_test_data()
+        mediasort.scan_files("source", "source", 1, output_formats['MONTHLY'])
+        self.assertTrue(os.path.exists(os.path.join("source", "2019-08")))
+        self.assertTrue(os.path.exists(os.path.join("source", "1975-05", "video")))
+        self.assertTrue(os.path.isfile(os.path.join("source", "1975-05", "video", "file-19750517_091500.mp4")))
+        self.assertTrue(os.path.isfile(os.path.join("source", "2019-08", "IMG_4810.jpeg")))
+        mediasort.scan_files("source", "source", 2, output_formats['MONTHLY'])
+        self.assertFalse(os.path.exists(os.path.join("source", "2019", "2019")))
+        self.assertFalse(os.path.exists(os.path.join("source", "2020", "2020")))
+        testdata.cleanup_test_data()
 
 if __name__ == '__main__':
     logging.basicConfig(filename='./test_mediasort.log', format='%(asctime)s %(levelname)s %(message)s',
