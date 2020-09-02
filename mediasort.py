@@ -32,7 +32,7 @@ datetime_formats = {
     'OTHER': {'regex': r'\d{8}\-\d{4}', 'datetime': '%Y%m%d-%H%M'}
 }
 
-skip_folders = ["@eaDir", "thumbs.db"]
+skip_folders = ["@eaDir", ".DS_Store", "Thumbs.db"]
 
 FILE_EXTENSION_EXIF = 'JPG|jpg|jpeg|BMP|bmp|PNG|png'
 FILE_EXTENSION_VIDEO = 'MPG|mpg|MOV|mov|AVI|avi|MPEG|mpeg|MP4|mp4'
