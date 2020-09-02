@@ -84,9 +84,12 @@ def get_date_from_exif(exif_data):
     date_str = get_field(exif_data, 'DateTime')
     return date_str
 
+
 def get_model_from_exif(exif_data):
     model_str = get_field(exif_data, 'Model')
-    return model_str
+    logging.debug("Model: " + str(model_str))
+    return str(model_str)
+
 
 def create_target_folder(path):
     if not os.path.exists(path):
@@ -102,24 +105,24 @@ def create_target_folder(path):
 def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
     moved = False
     create_target_folder(os.path.join(target_folder, subfolder_name, video))
+    if os.path.join(source_folder, filename) == os.path.join(target_folder, subfolder_name, video, filename):
+        logging.info("Skipping: " +
+                     os.path.join(source_folder, filename) + ": moving to " +
+                     os.path.join(target_folder, subfolder_name, video))
+        moved = True
 
-    if not opt_simulate:
-        if os.path.join(source_folder, filename) != os.path.join(target_folder, subfolder_name, video, filename):
-            try:
-                shutil.move(os.path.join(source_folder, filename),
-                            os.path.join(target_folder, subfolder_name, video))
-                logging.info(
+    elif not opt_simulate:
+        try:
+            shutil.move(os.path.join(source_folder, filename),
+                        os.path.join(target_folder, subfolder_name, video))
+            logging.info(
                     os.path.join(source_folder, filename) + ": moving to " +
                     os.path.join(target_folder, subfolder_name, video))
-            except IOError as ioe:
-                logging.error(str(ioe))
-                moved = False
-            else:
-                moved = True
+        except IOError as ioe:
+            logging.error(str(ioe))
+            moved = False
         else:
-            logging.info("Skipping: " +
-                         os.path.join(source_folder, filename) + ": moving to " +
-                         os.path.join(target_folder, subfolder_name, video))
+            moved = True
     else:
         logging.info("Simulation: " +
                      os.path.join(source_folder, filename) + ": moving to " +
@@ -159,6 +162,7 @@ def move_exif_file(exif_file, filename, source, output, output_format):
         if exif_data:
             subfolder_name = make_foldername_from_date(get_date_from_exif(exif_data), DATETIME_FORMAT_EXIF,
                                                        output_format)
+
             if get_model_from_exif(exif_data) == "":
                 other = DEFAULT_OTHER_FOLDER
 
