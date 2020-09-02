@@ -10,6 +10,7 @@ from PIL import Image
 from mediasort import get_date_from_filename, make_foldername_from_date, get_model_from_exif
 from mediasort import output_formats, datetime_formats
 
+
 # atexit.register(testdata.cleanup_test_data)
 
 
@@ -33,6 +34,11 @@ class MediasortOutput(unittest.TestCase):
         self.assertEqual(make_foldername_from_date("19750517_153425", datetime_formats['IOS']['datetime'], output_formats['DAILY']),
                          "1975-05-17-Sat")
 
+    def test_make_foldername_short_date(self):
+        self.log_testcase_name(inspect.currentframe().f_code.co_name)
+        self.assertEqual(make_foldername_from_date("19750517-1534", datetime_formats['OTHER']['datetime'],
+                                                   output_formats['MONTHLY']),
+                         "1975-05")
     # system tests
     def test_get_model_from_exif(self):
         testdata.create_test_data()
@@ -67,7 +73,7 @@ class MediasortOutput(unittest.TestCase):
         testdata.create_test_data()
         mediasort.scan_files("source", "target", 0, output_formats['MONTHLY'])
         self.assertTrue(os.path.exists(os.path.join("target", "2020-05", "other")))
-        self.assertTrue(os.path.isfile(os.path.join("target", "2020-05", "other", "IMG_20200506_125846.jpg")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "2020-05", "other", "IMG_20200506-125846.jpg")))
         testdata.cleanup_test_data()
 
     def test_yearly_output(self):
@@ -78,6 +84,7 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join("target", "1975")))
         self.assertTrue(os.path.isfile(os.path.join("target", "2019", "IMG_4810.jpeg")))
         self.assertTrue(os.path.isfile(os.path.join("target", "2019", "other", "IMG_20190610_190809.JPG")))
+        self.assertTrue(os.path.isfile(os.path.join("target", "1975", "video", "file-19750517-0915_bla.mp4")))
         testdata.cleanup_test_data()
 
     def test_daily_output(self):
@@ -88,6 +95,7 @@ class MediasortOutput(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517_091500.mp4")))
         self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517_091500_1.mp4")))
         self.assertTrue(os.path.isfile(os.path.join("target", "1975-05-17-Sat", "video", "file-19750517-091500.mp4")))
+
         testdata.cleanup_test_data()
 
     def test_recursion_lvl1(self):
@@ -124,9 +132,10 @@ class MediasortOutput(unittest.TestCase):
         self.log_testcase_name(inspect.currentframe().f_code.co_name)
         testdata.create_test_data()
         mediasort.scan_files("source", "source", 1, output_formats['MONTHLY'])
-        self.assertTrue(os.path.exists(os.path.join("source", "2019-08")))
+
         self.assertTrue(os.path.exists(os.path.join("source", "1975-05", "video")))
         self.assertTrue(os.path.isfile(os.path.join("source", "1975-05", "video", "file-19750517_091500.mp4")))
+        self.assertTrue(os.path.exists(os.path.join("source", "2019-08")))
         self.assertTrue(os.path.isfile(os.path.join("source", "2019-08", "IMG_4810.jpeg")))
         mediasort.scan_files("source", "source", 2, output_formats['MONTHLY'])
         self.assertFalse(os.path.exists(os.path.join("source", "2019", "2019")))

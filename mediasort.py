@@ -29,7 +29,7 @@ DATETIME_FORMAT_EXIF = "%Y:%m:%d %H:%M:%S"
 
 datetime_formats = {
     'IOS': {'regex': r'\d{8}_\d{6}', 'datetime': '%Y%m%d_%H%M%S'},
-    'OTHER': {'regex': r'\d{8}\-\d{6}', 'datetime': '%Y%m%d-%H%M%S'}
+    'OTHER': {'regex': r'\d{8}\-\d{4}', 'datetime': '%Y%m%d-%H%M'}
 }
 
 skip_folders = ["@eaDir", "thumbs.db"]
@@ -127,6 +127,7 @@ def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
         logging.info("Simulation: " +
                      os.path.join(source_folder, filename) + ": moving to " +
                      os.path.join(target_folder, subfolder_name, video))
+        moved = True
     return moved
 
 
@@ -232,8 +233,11 @@ def scan_files(source, output, max_recursion_level, output_format):
                 match = True
                 break
             elif os.path.isdir(os.path.join(source, filename)):
+
                 logging.debug(os.path.join(source, filename) + ": Is a directory ")
+                logging.debug("Format: " + datetime_format)
                 match = True
+                break
 
         if not match:
             logging.warning(os.path.join(source, filename) + ": Can't get date from exif or filename ")

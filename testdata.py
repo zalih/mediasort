@@ -25,6 +25,7 @@ def create_test_data():
     os.close(os.open(os.path.join("source", "file-19750517_091500.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "file-19750517_091500_1.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "file-19750517-091500.mp4"), os.O_CREAT))
+    os.close(os.open(os.path.join("source", "file-19750517-0915_bla.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "lvl11", "file11-19750517_091500.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "lvl11", "lvl21", "file21-19750517_091500.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "lvl11", "lvl21", "lvl31", "file31-19750517_091500.mp4"), os.O_CREAT))
