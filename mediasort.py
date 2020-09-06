@@ -301,6 +301,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    logfile = __file__ + '.log'
     logging.basicConfig(filename='./mediasort.log',
                         format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S',
