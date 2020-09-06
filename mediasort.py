@@ -103,13 +103,12 @@ def create_target_folder(path):
 
 
 def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
-    moved = False
     create_target_folder(os.path.join(target_folder, subfolder_name, video))
     if os.path.join(source_folder, filename) == os.path.join(target_folder, subfolder_name, video, filename):
         logging.info("Skipping: " +
                      os.path.join(source_folder, filename) + ": moving to " +
-                     os.path.join(target_folder, subfolder_name, video))
-        moved = True
+                     os.path.join(target_folder, subfolder_name, video) +
+                     "source = target")
 
     elif not opt_simulate:
         try:
@@ -118,17 +117,16 @@ def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
             logging.info(
                     os.path.join(source_folder, filename) + ": moving to " +
                     os.path.join(target_folder, subfolder_name, video))
-        except IOError as ioe:
-            logging.error(str(ioe))
-            moved = False
-        else:
-            moved = True
+        except Exception as e:
+            logging.error(str(e))
+            logging.info("Skipping: " +
+                         os.path.join(source_folder, filename) + ": moving to " +
+                         os.path.join(target_folder, subfolder_name, video))
     else:
         logging.info("Simulation: " +
                      os.path.join(source_folder, filename) + ": moving to " +
                      os.path.join(target_folder, subfolder_name, video))
-        moved = True
-    return moved
+    return
 
 
 def move_video_file(filename, source, target, output_format, datetime_format):

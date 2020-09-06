@@ -21,7 +21,9 @@ def create_test_data():
     os.makedirs(os.path.join("source", "lvl13", "lvl23", "lvl33"))
     os.makedirs(os.path.join("source", "@eaDir", "IMG_20190610_190809.JPG"))
     os.makedirs(os.path.join("target"))
+    os.makedirs(os.path.join("target", "1980-05", "video"))  # for testing if target exists
 
+    os.close(os.open(os.path.join("source", "file-19800517_091500.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "file-19750517_091500.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "file-19750517_091500_1.mp4"), os.O_CREAT))
     os.close(os.open(os.path.join("source", "file-19750517-091500.mp4"), os.O_CREAT))
@@ -38,5 +40,6 @@ def create_test_data():
 
     for testfile in glob.glob(os.path.join("testdata", "*")):
         shutil.copy2(testfile, "source")
+    shutil.copy2(os.path.join("source", "file-19800517_091500.mp4"), os.path.join("target", "1980-05", "video"))
     return
 
