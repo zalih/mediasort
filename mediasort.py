@@ -104,28 +104,20 @@ def create_target_folder(path):
 
 def move_file(filename, source_folder, target_folder, subfolder_name, video=""):
     create_target_folder(os.path.join(target_folder, subfolder_name, video))
+    logging.info("[MOVE] " +
+                 os.path.join(source_folder, filename) + " to " +
+                 os.path.join(target_folder, subfolder_name, video)
+                 )
     if os.path.join(source_folder, filename) == os.path.join(target_folder, subfolder_name, video, filename):
-        logging.info("Skipping: " +
-                     os.path.join(source_folder, filename) + ": moving to " +
-                     os.path.join(target_folder, subfolder_name, video) +
-                     "source = target")
+        logging.info("[SKIP] Source = Target! ")
 
     elif not opt_simulate:
         try:
             shutil.move(os.path.join(source_folder, filename),
                         os.path.join(target_folder, subfolder_name, video))
-            logging.info(
-                    os.path.join(source_folder, filename) + ": moving to " +
-                    os.path.join(target_folder, subfolder_name, video))
         except Exception as e:
             logging.error(str(e))
-            logging.info("Skipping: " +
-                         os.path.join(source_folder, filename) + ": moving to " +
-                         os.path.join(target_folder, subfolder_name, video))
-    else:
-        logging.info("Simulation: " +
-                     os.path.join(source_folder, filename) + ": moving to " +
-                     os.path.join(target_folder, subfolder_name, video))
+            logging.info("[SKIP] shutil error ")
     return
 
 
@@ -293,6 +285,10 @@ def main(argv):
         opt_single = False
     if opt_recursion:
         logging.debug("Recursion:" + str(opt_recursion))
+    if opt_simulate:
+        logging.info("****** Simulation Mode *******")
+    else:
+        logging.info("****** Active Mode *******")
 
     # start reading the source folder
     scan_files(source_folder, output_folder, opt_recursion, output_format)
